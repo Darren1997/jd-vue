@@ -51,11 +51,10 @@
              <template v-if="cartCount">总计：<span class="check__info__price">&yen;{{totalPrice}}</span></template>
              <template v-if="cartCount==0">总计：购物车为空</template>
          </div>
-         <div class="check__btn">
-         <router-link v-if="totalPrice" :to="{ path: `/orderConfirmation/${shopId}` }">
-             去结算
-             </router-link>
-           </div>
+         <router-link v-if="totalPrice>0" :to="{ path: `/orderConfirmation/${shopId}` }">
+             <div class="check__btn">去结算</div>
+         </router-link>
+         <div v-if="totalPrice==0" class="check__btn">去结算</div>
      </div>
  </div>
 </template>

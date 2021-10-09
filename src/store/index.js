@@ -96,9 +96,5 @@ export default Vuex.createStore({
       }
       setLocalCartList(state)
     }
-  },
-  actions: {
-  },
-  modules: {
   }
 })

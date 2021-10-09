@@ -3,7 +3,7 @@
       <StaticPart />
       <Nearby />
     </div>
-    <Docker />
+    <Docker :currenIndex = 0 />
 </template>
 
 <script>

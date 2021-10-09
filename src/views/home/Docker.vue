@@ -1,7 +1,8 @@
 <template>
     <div class="docker">
       <div v-for="(item, index) in dockerList" :key="item.iconcode"
-      :class="{'docker__item': true, 'docker__item--active': index === 0}">
+      :class="{'docker__item': true, 'docker__item--active': index === currenIndex}"
+      @click="() => handleClick(index)">
         <div class="iconfont" v-html="item.iconcode"></div>
         <div class="docker__title">{{item.des}}</div>
       </div>
@@ -9,8 +10,23 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router'
+
+const useHandleClickEffect = () => {
+  const router = useRouter()
+  const handleClick = (index) => {
+    if (index === 0) {
+      router.push({ name: 'Home' })
+    } else if (index === 2) {
+      router.push({ name: 'Order' })
+    }
+  }
+  return { handleClick }
+}
+
 export default {
   name: 'Docker',
+  props: ['currenIndex'],
   setup () {
     const dockerList = [
       { iconcode: '&#xe619;', des: '首页' },
@@ -18,7 +34,8 @@ export default {
       { iconcode: '&#xe615;', des: '订单' },
       { iconcode: '&#xe611;', des: '我的' }
     ]
-    return { dockerList }
+    const { handleClick } = useHandleClickEffect()
+    return { dockerList, handleClick }
   }
 }
 </script>

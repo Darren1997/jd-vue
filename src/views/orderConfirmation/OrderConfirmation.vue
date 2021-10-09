@@ -44,8 +44,8 @@
         <div class="toast__title">确认要离开收银台？</div>
         <div class="toast__des">请尽快完成支付，否则将被取消</div>
         <div class="toast__btns">
-            <div class="toast__btn toast__btn1"  @click.stop="handleShowToast">取消订单</div>
-            <div class="toast__btn toast__btn2"  @click.stop="handleShowToast">确认支付</div>
+            <div class="toast__btn toast__btn1"  @click.stop="()=>{handleConfirmOrder(shopId, shopName, checkedList, true)}">取消订单</div>
+            <div class="toast__btn toast__btn2"  @click.stop="()=>{handleConfirmOrder(shopId, shopName, checkedList, false)}">确认支付</div>
         </div>
     </div>
 </div>
@@ -55,6 +55,7 @@
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { ref } from 'vue'
+import { post } from '../../utils/request'
 
 const showToast = ref(false)
 
@@ -69,8 +70,8 @@ const handleBackEffect = () => {
 // 获取购物车详情
 const useCartEffect = () => {
   const route = useRoute()
-  const store = useStore()
   const shopId = route.params.shopId
+  const store = useStore()
   const state = store.state
   const shopName = state.cartList[shopId]?.shopName
   const productList = state.cartList[shopId]?.productList || {}
@@ -85,7 +86,7 @@ const useCartEffect = () => {
     }
   }
   totalPrice = totalPrice.toFixed(2)
-  return { checkedList, shopName, totalCount, totalPrice }
+  return { checkedList, shopName, totalCount, totalPrice, shopId }
 }
 
 // 控制显示toast
@@ -96,13 +97,57 @@ const usehanleShowToastEffect = () => {
   return { handleShowToast }
 }
 
+// 提交/取消订单
+const handleConfirmOrderEffect = () => {
+  const router = useRouter()
+  const store = useStore()
+  const handleConfirmOrder = async (shopId, shopName, checkedList, isCanceled) => {
+    const products = []
+    for (var i in checkedList) {
+      products.push({ id: parseInt(checkedList[i]._id), num: checkedList[i].count })
+    }
+    try {
+      const result = await post('/api/order', {
+        addressId: 1,
+        shopId: parseInt(shopId),
+        shopName,
+        isCanceled,
+        products
+      })
+      if (result?.errno === 0) {
+        showToast.value = false
+        if (isCanceled === false) {
+          store.commit('clearCart', { shopId: shopId })
+          router.push({ name: 'Order' })
+        }
+      } else {
+        console.log('fail!')
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  return { handleConfirmOrder }
+}
+
 export default {
   name: 'OrderConfirmation',
   setup () {
     const { handleBack } = handleBackEffect()
-    const { checkedList, shopName, totalCount, totalPrice } = useCartEffect()
+    const { checkedList, shopName, totalCount, totalPrice, shopId } = useCartEffect()
     const { handleShowToast } = usehanleShowToastEffect()
-    return { handleBack, checkedList, shopName, totalCount, totalPrice, showToast, handleShowToast }
+    const { handleConfirmOrder } = handleConfirmOrderEffect()
+    return {
+      handleBack,
+      checkedList,
+      shopName,
+      totalCount,
+      totalPrice,
+      shopId,
+      showToast,
+      handleShowToast,
+      handleConfirmOrder
+    }
   }
 }
 </script>

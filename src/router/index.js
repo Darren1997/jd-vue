@@ -33,6 +33,10 @@ const routes = [
     path: '/orderConfirmation/:shopId',
     name: 'OrderConfirmation',
     component: () => import(/* webpackChunkName: "show" */ '../views/orderConfirmation/OrderConfirmation')
+  }, {
+    path: '/order',
+    name: 'Order',
+    component: () => import(/* webpackChunkName: "show" */ '../views/order/Order')
   }
   // {
   //   path: '/about',
